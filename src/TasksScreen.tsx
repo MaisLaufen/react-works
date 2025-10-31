@@ -4,19 +4,27 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createTaskHandlers } from './taskHandler';
 import { ListScreenRefactored } from './tasks/task4/ListScreenRefactored';
 import { useAsyncStorage } from './tasks/task5/asyncStorageHook';
+import { ColorBlenderProvider } from './tasks/task6/ColorBlenderContext';
+import ColorBlender from './tasks/task6/ColorBlender';
 
 export const TasksScreen = () => {
   const [message, setMessage] = useState<string>("");
   const [showRefactoredList, setShowRefactoredList] = useState(false);
   const [task5Count, setTask5Count] = useAsyncStorage<number>('task5ExecutionCount', 0);
+  const [showColorBlender, setShowColorBlender] = useState(false);
 
   const handleTask5WithStorage = async () => {
     setTask5Count(prevCount => prevCount + 1);
+  };
+
+  const toggleNumberBlender = () => {
+    setShowColorBlender(prev => !prev);
   };
 
   const {
@@ -37,7 +45,7 @@ export const TasksScreen = () => {
     { id: "3", title: "Задание 3", onPress: handleTask3 },
     { id: "4", title: "Задание 4", onPress: () => setShowRefactoredList(true) },
     { id: "5", title: `Задание 5 (Нажато: ${task5Count}) раз`, onPress: handleTask5WithStorage }, // Обновляем onPress и title
-    { id: "6", title: "Задание 6", onPress: handleTask6 },
+    { id: "6", title: "Задание 6 (Number Blender)", onPress: toggleNumberBlender },
     { id: "7", title: "Задание 7", onPress: handleTask7 },
     { id: "8", title: "Задание 8", onPress: handleTask8 },
     { id: "9", title: "Задание 9", onPress: handleTask9 },
@@ -53,6 +61,21 @@ export const TasksScreen = () => {
     </TouchableOpacity>
   );
 
+  if (showColorBlender) {
+    return (
+      <ColorBlenderProvider>
+        <View style={{ flex: 1, backgroundColor: '#121212' }}>
+          <ColorBlender />
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => setShowColorBlender(false)}>
+              <Text style={styles.backButtonText}>Назад к задачам</Text>
+          </TouchableOpacity>
+        </View>
+      </ColorBlenderProvider>
+    );
+  }
+  
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>ПИР Ефтифанов</Text>
@@ -109,6 +132,18 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: '600',
+  },
+  backButton: {
+    padding: 16,
+    backgroundColor: '#393939',
+    margin: 16,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  backButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500',
   },
 });
 
