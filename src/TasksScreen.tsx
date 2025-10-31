@@ -44,8 +44,8 @@ export const TasksScreen = () => {
     { id: "2", title: "Задание 2", onPress: handleTask2 },
     { id: "3", title: "Задание 3", onPress: handleTask3 },
     { id: "4", title: "Задание 4", onPress: () => setShowRefactoredList(true) },
-    { id: "5", title: `Задание 5 (Нажато: ${task5Count}) раз`, onPress: handleTask5WithStorage }, // Обновляем onPress и title
-    { id: "6", title: "Задание 6 (Number Blender)", onPress: toggleNumberBlender },
+    { id: "5", title: `Задание 5 (Нажато: ${task5Count} раз)`, onPress: handleTask5WithStorage },
+    { id: "6", title: "Задание 6", onPress: toggleNumberBlender },
     { id: "7", title: "Задание 7", onPress: handleTask7 },
     { id: "8", title: "Задание 8", onPress: handleTask8 },
     { id: "9", title: "Задание 9", onPress: handleTask9 },
