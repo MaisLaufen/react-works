@@ -6,7 +6,7 @@ interface Item {
 }
 
 export const useListScreenLogic = () => {
-  const componentRerenderedTimes = useRef(0);
+  const componentRerenderedTimes = useRef(0); // Из-за того, что значение передается после рендера, это число отстает на 1 итерацию.
 
   const [data, setData] = useState<Item[]>(() =>
     new Array(1000)

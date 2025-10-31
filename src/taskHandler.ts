@@ -17,7 +17,7 @@ export const createTaskHandlers = (
     delay: 3000,
     delaySinceCompletion: true,
     waitForPrevious: true,
-    queueLimit: 3,
+    queueLimit: 1,
   });
 
   // Задача 2
