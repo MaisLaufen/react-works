@@ -29,6 +29,7 @@ export const createTaskHandlers = (
     obj.e.f.g.h = 42;
 
     Alert.alert("Результат", JSON.stringify(obj, null, 2));
+    console.log(obj)
   };
 
   // Задача 3

@@ -10,31 +10,33 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { createTaskHandlers } from './taskHandler';
 import { ListScreenRefactored } from './tasks/task4/ListScreenRefactored';
 import { useAsyncStorage } from './tasks/task5/asyncStorageHook';
-import { ColorBlenderProvider } from './tasks/task6/ColorBlenderContext';
-import ColorBlender from './tasks/task6/ColorBlender';
+import { ColorBlenderProvider } from './tasks/task6_1/ColorBlenderContext';
+import ColorBlender from './tasks/task6_1/ColorBlender';
+import ColorBlenderComponentMobX from './tasks/task7/ColorBlender';
 
 export const TasksScreen = () => {
   const [message, setMessage] = useState<string>("");
-  const [showRefactoredList, setShowRefactoredList] = useState(false);
+  const [showTask4, setShowTask4] = useState(false);
   const [task5Count, setTask5Count] = useAsyncStorage<number>('task5ExecutionCount', 0);
-  const [showColorBlender, setShowColorBlender] = useState(false);
+  const [showTask6, setShowTask6] = useState(false);
+  const [showTask7, setShowTask7] = useState(false);
 
-  const handleTask5WithStorage = async () => {
+  const handleTask5 = async () => {
     setTask5Count(prevCount => prevCount + 1);
   };
 
-  const toggleNumberBlender = () => {
-    setShowColorBlender(prev => !prev);
+  const handleTask6 = () => {
+    setShowTask6(prev => !prev);
   };
+  
+  const handleTask7 = async () => {
+    setShowTask7(prev => !prev);
+  }
 
   const {
     handleTask1,
     handleTask2,
     handleTask3,
-    handleTask4,
-    handleTask5,
-    handleTask6,
-    handleTask7,
     handleTask8,
     handleTask9,
   } = createTaskHandlers(setMessage);
@@ -43,16 +45,16 @@ export const TasksScreen = () => {
     { id: "1", title: "Задание 1", onPress: handleTask1 },
     { id: "2", title: "Задание 2", onPress: handleTask2 },
     { id: "3", title: "Задание 3", onPress: handleTask3 },
-    { id: "4", title: "Задание 4", onPress: () => setShowRefactoredList(true) },
-    { id: "5", title: `Задание 5 (Нажато: ${task5Count} раз)`, onPress: handleTask5WithStorage },
-    { id: "6", title: "Задание 6", onPress: toggleNumberBlender },
+    { id: "4", title: "Задание 4", onPress: () => setShowTask4(true) },
+    { id: "5", title: `Задание 5 (Нажато: ${task5Count} раз)`, onPress: handleTask5 },
+    { id: "6", title: "Задание 6", onPress: handleTask6 },
     { id: "7", title: "Задание 7", onPress: handleTask7 },
     { id: "8", title: "Задание 8", onPress: handleTask8 },
     { id: "9", title: "Задание 9", onPress: handleTask9 },
   ];
 
-   if (showRefactoredList) {
-    return <ListScreenRefactored onBack={() => setShowRefactoredList(false)} />;
+   if (showTask4) {
+    return <ListScreenRefactored onBack={() => setShowTask4(false)} />;
   }
 
   const renderItem = ({ item }: { item: typeof tasks[0] }) => (
@@ -61,18 +63,32 @@ export const TasksScreen = () => {
     </TouchableOpacity>
   );
 
-  if (showColorBlender) {
+  if (showTask6) {
     return (
       <ColorBlenderProvider>
         <View style={{ flex: 1, backgroundColor: '#121212' }}>
           <ColorBlender />
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => setShowColorBlender(false)}>
+            onPress={() => setShowTask6(false)}>
               <Text style={styles.backButtonText}>Назад к задачам</Text>
           </TouchableOpacity>
         </View>
       </ColorBlenderProvider>
+    );
+  }
+
+  if (showTask7) {
+    return (
+        <View style={{ flex: 1, backgroundColor: '#121212' }}>
+          <ColorBlenderComponentMobX />
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => setShowTask7(false)}
+          >
+            <Text style={styles.backButtonText}>Назад к задачам</Text>
+          </TouchableOpacity>
+        </View>
     );
   }
   
