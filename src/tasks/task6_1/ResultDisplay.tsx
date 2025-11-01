@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useColorBlender } from './ColorBlenderContext';
 import { withStyledContainer } from './withStyle';
-import TreeNodeComponent from '../task7/TreeNode';
-import { buildColorTree } from '../task7/buildColorTree';
+import TreeNodeComponent from '../task6_2/TreeNode';
+import { buildColorTree } from '../task6_2/buildColorTree';
 
 const ResultDisplayComponent: React.FC = () => {
   const { result, selectionA, selectionB, blend } = useColorBlender();

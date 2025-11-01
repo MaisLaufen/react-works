@@ -1,5 +1,5 @@
-import { TreeNode } from './colorBlenderTree'; // Убедитесь, что путь правильный
-import { isWarmColor, isLightColor } from './colorUtils'; // Убедитесь, что путь правильный
+import { TreeNode } from './colorBlenderTree';
+import { isWarmColor, isLightColor } from './colorUtils';
 
 export const buildColorTree = (colorA: string, colorB: string): TreeNode => {
   const typeA = { warm: isWarmColor(colorA), light: isLightColor(colorA) };
