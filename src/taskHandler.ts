@@ -48,7 +48,7 @@ export const createTaskHandlers = (
   const handleTask7 = () => Alert.alert("Задание 7", "Описание задания 7");
   
   // Задача 8
-  const handleTask8 = () => Alert.alert("Задание 8", "Описание задания 8");
+  const handleTask8 = () => Alert.alert("Задание 8 только для React Web", "React Native использует Metro, а не Webpack: Metro — это стандартный сборщик модулей, используемый в React Native. Он оптимизирован под мобильные платформы и отличается от Webpack, который используется в веб-приложениях. Поддержка TypeScript и SASS: TypeScript в React Native поддерживается, но через metro-config и typescript, а не через webpack.config.js. SASS/SCSS также можно использовать, но через сторонние библиотеки и дополнительную настройку Metro, а не Webpack.");
   
   // Задача 9
   const handleTask9 = () => Alert.alert("Задание 9", "Описание задания 9");

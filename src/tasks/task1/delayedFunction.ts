@@ -7,6 +7,12 @@ export type DebounceQueueOptions = {
   queueLimit?: number;
 };
 
+type QueueItem<T extends (...args: any[]) => any> = {
+  args: Parameters<T>;
+  resolve: (value: ReturnType<T> | PromiseLike<ReturnType<T>>) => void;
+  reject: (reason?: any) => void;
+};
+
 export function delayedFunction<T extends (...args: any[]) => any>(
   fn: T,
   {
@@ -18,66 +24,89 @@ export function delayedFunction<T extends (...args: any[]) => any>(
 ): (...args: Parameters<T>) => Promise<ReturnType<T>> {
   let lastCallTime = 0;
   let lastCompletionTime = 0;
-  let timer: ReturnType<typeof setTimeout> | null = null;
-  let running = false;
-  let totalActive = 0;
+  let timerId: ReturnType<typeof setTimeout> | null = null;
+  let isRunning = false;
+  let activeCount = 0;
 
-  const queue: {
-    args: Parameters<T>;
-    resolve: (v: any) => void;
-    reject: (e: any) => void;
-  }[] = [];
+  const queue: QueueItem<T>[] = [];
 
   const executeNext = async () => {
-    // ничего не делаем, если уже идёт выполнение или очередь пуста
-    if (running || queue.length === 0) return;
+    if (isRunning || queue.length === 0) {
+      if (queue.length === 0 && timerId) {
+        clearTimeout(timerId);
+        timerId = null;
+      }
+      return;
+    }
 
     const now = Date.now();
-    const since = delaySinceCompletion ? lastCompletionTime : lastCallTime;
-    const elapsed = now - since;
+
+    const referenceTime = delaySinceCompletion ? lastCompletionTime : lastCallTime;
+    const elapsed = now - referenceTime;
 
     if (elapsed < delay) {
-      timer = setTimeout(executeNext, delay - elapsed);
+      if (timerId) clearTimeout(timerId);
+      timerId = setTimeout(executeNext, delay - elapsed);
       return;
     }
 
     const { args, resolve, reject } = queue.shift()!;
-    running = true;
-    totalActive++;
-    lastCallTime = Date.now();
+    isRunning = true;
+    activeCount++;
 
     try {
+      if (!delaySinceCompletion) {
+        lastCallTime = Date.now();
+      }
       const result = await fn(...args);
+      if (delaySinceCompletion) {
+        lastCompletionTime = Date.now();
+      }
+
       resolve(result);
-    } catch (err) {
-      reject(err);
+    } catch (error) {
+      reject(error);
     } finally {
-      running = false;
-      totalActive--;
-      lastCompletionTime = Date.now();
+      isRunning = false;
+      activeCount--;
 
       if (waitForPrevious) {
-        timer = setTimeout(executeNext, delay);
+        if (timerId) clearTimeout(timerId);
+        timerId = setTimeout(() => {
+          executeNext();
+        }, delay);
       } else {
-        executeNext();
+        if (timerId) clearTimeout(timerId);
+        timerId = setTimeout(() => {
+          executeNext();
+        }, 0);
       }
     }
   };
 
-  return (...args: Parameters<T>) => {
+  return (...args: Parameters<T>): Promise<ReturnType<T>> => {
     return new Promise<ReturnType<T>>((resolve, reject) => {
-      const currentLoad = totalActive + queue.length;
+      const currentLoad = activeCount + queue.length;
       if (currentLoad >= queueLimit) {
         Alert.alert(`Очередь вызова переполнена. Максимум: ${queueLimit}`);
         return;
       }
-
       queue.push({ args, resolve, reject });
-
-      if (queue.length >= queueLimit) {
-        if (!running) executeNext();
-      } else {
-        executeNext();
+      if (!isRunning && activeCount === 0 && queue.length === 1) {
+        const now = Date.now();
+        const referenceTime = delaySinceCompletion ? lastCompletionTime : lastCallTime;
+        const elapsed = now - referenceTime;
+        if (elapsed < delay) {
+          if (timerId) clearTimeout(timerId);
+          timerId = setTimeout(() => {
+            executeNext();
+          }, delay - elapsed);
+        } else {
+          if (timerId) clearTimeout(timerId);
+          timerId = setTimeout(() => {
+            executeNext();
+          }, 0);
+        }
       }
     });
   };
